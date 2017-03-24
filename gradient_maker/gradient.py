@@ -12,8 +12,8 @@ from ucs.constants import EPS, floatX, Surrounds
 
 from gradient_maker.optimizer import AdamOptimizer
 
-# Functions compiled in make_gradient() that should persist across instances of Gradient
-loss, grad = None, None
+# Function compiled in make_gradient() that should persist across instances of Gradient
+opfunc = None
 
 
 class BgColors:
@@ -41,7 +41,7 @@ class Gradient:
         Gradient(None, None, compile_only=True)
 
     def make_gradient(self, steps=30, bg=BgColors.NEUTRAL, diff_weight=1e4, callback=None):
-        global loss, grad
+        global opfunc
 
         start = time.perf_counter()
 
@@ -53,7 +53,7 @@ class Gradient:
             diff_loss = T.mean(T.sqr(diff - ideal_diff))
             return ucs_loss + diff_loss * diff_weight
 
-        if loss is None:
+        if opfunc is None:
             rgb, _ideal_jab, _ideal_diff = T.matrices('rgb', 'ideal_jab', 'ideal_diff')
             loss_sym = _loss(rgb, _ideal_jab, _ideal_diff)
             grad_sym = T.grad(loss_sym, rgb)
@@ -61,12 +61,9 @@ class Gradient:
             # Ensure this function is compiled
             ucs.srgb_to_ucs([1, 1, 1])
 
-            print('Building loss()...', file=sys.stderr)
-            loss = theano.function([rgb, _ideal_jab, _ideal_diff], loss_sym,
-                                   allow_input_downcast=True, on_unused_input='ignore')
-            print('Building grad()...', file=sys.stderr)
-            grad = theano.function([rgb, _ideal_jab, _ideal_diff], grad_sym,
-                                   allow_input_downcast=True, on_unused_input='ignore')
+            print('Building opfunc()...', file=sys.stderr)
+            opfunc = theano.function([rgb, _ideal_jab, _ideal_diff], [loss_sym, grad_sym],
+                                     allow_input_downcast=True, on_unused_input='ignore')
             print('Done building functions in {:.3g} seconds.'.format(time.perf_counter() - start),
                   file=sys.stderr)
 
@@ -85,20 +82,19 @@ class Gradient:
         ideal_diff = ideal_jab[1:, :] - ideal_jab[:-1, :]
 
         y = floatX(np.random.uniform(-EPS, EPS, size=ideal_jab.shape)) + 0.5
-        opt = AdamOptimizer(y,
-                            grad_fn=lambda y: grad(y, ideal_jab, ideal_diff),
-                            proj_fn=lambda y: np.clip(y, 0, 1))
+        opt = AdamOptimizer(y, opfunc=lambda y: opfunc(y, ideal_jab, ideal_diff),
+                            proj=lambda y: np.clip(y, 0, 1))
 
         print('Optimizing...', file=sys.stderr)
         for i in opt:
             if i % 100 == 0:
-                loss_ = float(loss(y, ideal_jab, ideal_diff))
+                loss_ = float(opfunc(y, ideal_jab, ideal_diff)[0])
                 if callback is not None:
                     callback('Iteration {:d}, loss = {:.3f}'.format(i, loss_))
 
         done = time.perf_counter()
         s = ('Loss was {:.3f} after {:d} iterations; make_gradient() took {:.3f} seconds.').format(
-            float(loss(y, ideal_jab, ideal_diff)), i, done - start,
+            float(opfunc(y, ideal_jab, ideal_diff)[0]), i, done - start,
         )
         print(s, file=sys.stderr)
 

@@ -1,16 +1,17 @@
-"""Implements the Adam algorithm for gradient descent."""
+"""Function minimization."""
 
 import numpy as np
 from ucs.constants import EPS
 
 
 class AdamOptimizer:
-    """Implements the Adam algorithm for gradient descent."""
-    def __init__(self, x, grad_fn, proj_fn=None, step_size=1e-4, b1=0.9, b2=0.999,
+    """Implements the Adam algorithm for gradient descent. Modifications from standard Adam include
+    projected gradient descent and adaptive momentum restarting."""
+    def __init__(self, x, opfunc, proj=None, step_size=1e-3, b1=0.98, b2=0.998,
                  factr=1e-6, maxiter=10000):
         self.x = x
-        self.grad_fn = grad_fn
-        self.proj_fn = proj_fn
+        self.opfunc = opfunc
+        self.proj = proj
         self.step_size = step_size
         self.b1 = b1
         self.b2 = b2
@@ -19,6 +20,8 @@ class AdamOptimizer:
         self.g1 = np.zeros_like(x)
         self.g2 = np.zeros_like(x)
         self.i = 0
+        self.last_loss = np.inf
+        self.last_grad = np.zeros_like(x)
 
     def __iter__(self):
         return self
@@ -28,15 +31,18 @@ class AdamOptimizer:
         if self.i > self.maxiter:
             raise StopIteration('maxiter reached.')
 
-        grad = self.grad_fn(self.x)
+        loss, grad = self.opfunc(self.x)
+        if loss > self.last_loss or np.sum(self.last_grad * grad) < 0:
+            self.g1[:] = 0
         self.g1[:] = self.b1*self.g1 + (1-self.b1)*grad
         self.g2[:] = self.b2*self.g2 + (1-self.b2)*grad**2
         old_x = self.x.copy()
         ss = self.step_size * np.sqrt(1-self.b2**self.i) / (1-self.b1**self.i)
         self.x -= ss * self.g1 / (np.sqrt(self.g2) + EPS)
-        if self.proj_fn is not None:
-            self.x[:] = self.proj_fn(self.x)
+        if self.proj is not None:
+            self.x[:] = self.proj(self.x)
         if np.mean(abs(old_x - self.x)) < self.factr:
             raise StopIteration('params change below tolerance.')
 
+        self.last_loss, self.last_grad = loss, grad
         return self.i
