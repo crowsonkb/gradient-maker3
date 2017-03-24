@@ -33,8 +33,10 @@ function ws_incoming(e) {
 }
 
 function submit() {
-    var value = $("#grad-spec")[0].value;
-    ws.send(JSON.stringify({_: "gradRequest", text: value}));
+    var text = $("#grad-spec")[0].value;
+    var steps = parseInt($("[name=steps]")[0].value)
+
+    ws.send(JSON.stringify({_: "gradRequest", text: text, steps: steps}));
 }
 
 $(document).ready(function() {

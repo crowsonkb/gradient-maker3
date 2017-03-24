@@ -14,6 +14,10 @@ button { padding: 4px 8px; }
 
 #content { margin: 0 8px; }
 
+#controls button, #controls input {
+    margin: 4px 0;
+}
+
 #error {
     color: rgb(100%, 33%, 33%);
     font-size: 14px;
@@ -28,6 +32,8 @@ button { padding: 4px 8px; }
 .gradient .dark-text { color: rgb(0%, 0%, 0%); }
 
 .gradient .light-text { color: rgb(100%, 100%, 100%); }
+
+input[type="number"] { width: 4em; }
 
 #progress { font-size: 14px; }
 

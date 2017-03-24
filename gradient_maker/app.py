@@ -40,7 +40,7 @@ async def websocket_handler(request):
             if msg['_'] == 'gradRequest':
                 def send(msg):
                     loop.call_soon_threadsafe(ws.send_json, msg)
-                task = loop.run_in_executor(None, grad_request, msg['text'], send)
+                task = loop.run_in_executor(None, grad_request, msg, send)
                 app.tasks.append(task)
             else:
                 continue
@@ -51,10 +51,10 @@ async def websocket_handler(request):
     return ws
 
 
-def grad_request(text, send):
+def grad_request(msg, send):
     parser = Parser()
     try:
-        parser.parse(text)
+        parser.parse(msg['text'])
     except ParseException as err:
         send({'_': 'error', 'text': str(err)})
         return
@@ -67,7 +67,7 @@ def grad_request(text, send):
         x = [point[0] for point in parser.grad_points]
         y = [point[1] for point in parser.grad_points]
         g = Gradient(x, floatX(y) / 255)
-        x_out, y_out, s = g.make_gradient(steps=30,
+        x_out, y_out, s = g.make_gradient(steps=msg['steps'],
                                           callback=lambda x: send({'_': 'progress', 'text': x}))
         send({'_': 'progress', 'text': s})
         send({'_': 'result', 'text': g.to_html(x_out, y_out)})
