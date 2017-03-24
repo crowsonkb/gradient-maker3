@@ -3,16 +3,19 @@
 {% block title %}Gradient generator{% endblock %}
 
 {% block content %}
-    <h1>Gradient generator</h1>
-    <textarea id="grad-spec" cols="40" rows="10">
+<h1>Gradient generator</h1>
+<textarea id="grad-spec" cols="40" rows="10">
 0: #333
 1/3: #669
 1/2: #b6b
-1: #ffc</textarea><br>
-    <button id="submit">Submit</button><br><br>
-    <span id="error"></span>
-    <span id="progress"></span>
-    <br><br>
-    <div id="result"></div>
-    <br>
+1: #ffc
+</textarea><br>
+<button id="submit">Submit</button><br><br>
+<span id="error"></span>
+<span id="progress"></span>
+<div id="result"></div>
+<div id="bottom-links">
+    <a href="https://github.com/crowsonkb/gradient-maker3">View on GitHub</a><br>
+    <a href="http://paypal.me/KatherineCrowson">Donate money to Katherine Crowson</a>
+</div>
 {% endblock %}
