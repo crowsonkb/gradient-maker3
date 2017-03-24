@@ -18,6 +18,11 @@ button { padding: 4px 8px; }
     margin: 4px 0;
 }
 
+#download-csv {
+    font-size: 14px;
+    margin-top: 8px;
+}
+
 #error {
     color: rgb(100%, 33%, 33%);
     font-size: 14px;
@@ -37,7 +42,7 @@ input[type="number"] { width: 4em; }
 
 #progress { font-size: 14px; }
 
-#result { margin-top: 16px; }
+#result { margin-top: 8px; }
 
 textarea {
     font-family: "SFMono-Regular", Menlo, Consolas, monospace;

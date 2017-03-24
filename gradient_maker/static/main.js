@@ -25,7 +25,8 @@ function ws_incoming(e) {
         break;
     case "result":
         $("#error").text("");
-        $("#result").html(msg.text);
+        $("#result").html(msg.html);
+        $("#download-csv").html("<a href='" + msg.downloadCsv + "'>Download as CSV</a>");
         break;
     default:
         break;
@@ -34,7 +35,7 @@ function ws_incoming(e) {
 
 function submit() {
     var text = $("#grad-spec")[0].value;
-    var steps = parseInt($("[name=steps]")[0].value)
+    var steps = parseInt($("[name=steps]")[0].value);
 
     ws.send(JSON.stringify({_: "gradRequest", text: text, steps: steps}));
 }

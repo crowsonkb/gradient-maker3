@@ -126,6 +126,15 @@ class Gradient:
         s.write('</div>\n')
         return s.getvalue()
 
+    @staticmethod
+    def to_csv(x, y):
+        s = io.StringIO()
+        s.write('x,r,g,b\n')
+        for x_elem, (r, g, b) in zip(x, y):
+            s.write(','.join(map(str, (x_elem, r, g, b))))
+            s.write('\n')
+        return s.getvalue()
+
 
 def main():
     """A simple test case."""
