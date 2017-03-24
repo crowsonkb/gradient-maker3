@@ -44,5 +44,5 @@ class AdamOptimizer:
         if np.mean(abs(old_x - self.x)) < self.factr:
             raise StopIteration('params change below tolerance.')
 
-        self.last_loss, self.last_grad = loss, grad
+        self.last_loss, self.last_grad[:] = loss, grad
         return self.i
