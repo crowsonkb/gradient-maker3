@@ -6,7 +6,8 @@ from ucs.constants import EPS
 
 class AdamOptimizer:
     """Implements the Adam algorithm for gradient descent. Modifications from standard Adam include
-    projected gradient descent and adaptive momentum restarting."""
+    projected gradient descent and adaptive restarting. The momentum parameters have been changed
+    from the default b1=0.9, b2=0.999 as well."""
     def __init__(self, x, opfunc, proj=None, step_size=1e-3, b1=0.98, b2=0.998,
                  factr=1e-6, maxiter=10000):
         self.x = x
