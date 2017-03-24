@@ -1,7 +1,7 @@
 gradient_maker
 ==============
 
-A web application to generate gradients using the CAM02-UCS colorspace. (See: `CIECAM02 and Its Recent Developments <http://www.springer.com/cda/content/document/cda_downloaddocument/9781441961891-c1.pdf>`_.)
+A web application to generate color gradients using the CAM02-UCS colorspace. (See: `CIECAM02 and Its Recent Developments <http://www.springer.com/cda/content/document/cda_downloaddocument/9781441961891-c1.pdf>`_.)
 
 Input colors are converted to the CAM02-UCS JMh (cylindrical) space and interpolation is performed. The resulting sequence is then converted to Jab (rectangular) format for gamut mapping. Projected gradient descent is employed, with two terms in the loss function: one term representing fidelity of an in-gamut Jab color in isolation to its ideal Jab color, the other penalizing deviations from the *first differences* of the ideal Jab color sequence. The second term keeps the sequence of colors spatially consistent. The CAM02-UCS forward transform was implemented in Theano for speed and Theano also autodifferentiates the forward transform. The reverse transform is not needed. The resulting sequence of RGB colors lies inside the sRGB gamut.
 
