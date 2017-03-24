@@ -1,0 +1,17 @@
+body {
+    background-color: rgb(50%, 50%, 50%);
+    color: rgb(90%, 90%, 90%);
+    font-face: -apple-system, BlinkMacSystemFont, "Lucida Grande", Arial, sans-serif;
+}
+
+button { padding: 4px 8px; }
+
+#content { margin: 0 8px; }
+
+#error {
+    color: rgb(100%, 33%, 33%);
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#progress { font-size: 14px; }
