@@ -69,8 +69,8 @@ def grad_request(text, send):
         g = Gradient(x, floatX(y) / 255)
         x_out, y_out, s = g.make_gradient(steps=30,
                                           callback=lambda x: send({'_': 'progress', 'text': x}))
-        g.print_stdout(x_out, y_out)
         send({'_': 'progress', 'text': s})
+        send({'_': 'result', 'text': g.to_html(x_out, y_out)})
 
 app.router.add_get('/', root_handler)
 app.router.add_static('/static', PACKAGE/'static')

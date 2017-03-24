@@ -1,5 +1,6 @@
 """Generates gradients using the CAM02-UCS colorspace."""
 
+import io
 import sys
 import time
 
@@ -85,7 +86,6 @@ class Gradient:
         opt = AdamOptimizer(y, opfunc=lambda y: opfunc(y, ideal_jab, ideal_diff),
                             proj=lambda y: np.clip(y, 0, 1))
 
-        print('Optimizing...', file=sys.stderr)
         for i in opt:
             if i % 100 == 0:
                 loss_ = float(opfunc(y, ideal_jab, ideal_diff)[0])
@@ -96,8 +96,6 @@ class Gradient:
         s = ('Loss was {:.3f} after {:d} iterations; make_gradient() took {:.3f} seconds.').format(
             float(opfunc(y, ideal_jab, ideal_diff)[0]), i, done - start,
         )
-        print(s, file=sys.stderr)
-
         return x, y, s
 
     @staticmethod
@@ -112,6 +110,21 @@ class Gradient:
             print('\033[48;2;{};{};{}m'.format(*rgb), end='')
             print('%.04f' % x_elem, rgb, end='')
             print('\033[0m')
+
+    @staticmethod
+    def to_html(x, y):
+        """Renders the gradient as HTML."""
+        s = io.StringIO()
+        s.write('<div class="gradient">\n')
+        for x_elem, elem in zip(x, y):
+            css_color = 'rgb({:.1f}%, {:.1f}%, {:.1f}%)'.format(*(elem * 100))
+            if ucs.srgb_to_xyz(elem)[1] < 1/2:
+                s.write('<div class="light-text" style="background-color: {};">'.format(css_color))
+            else:
+                s.write('<div class="dark-text" style="background-color: {};">'.format(css_color))
+            s.write('{}</div>\n'.format(css_color))
+        s.write('</div>\n')
+        return s.getvalue()
 
 
 def main():
