@@ -11,10 +11,13 @@
 1/2: #b6b
 1: #ffc
 </textarea><br>
-<div id="controls">
-    <button id="submit">Submit</button><br>
-    Steps: <input type="number" step="1" name="steps" value="30"><br>
-</div>
+<table id="controls">
+    <tr><td class="label">Steps<td><input type="number" step="1" name="steps" value="30">
+    <!-- <tr><td class="label">Periodic<td><input type="checkbox" value="periodic"> -->
+    <tr style="line-height: 50%;"><td colspan="2">&nbsp;
+    <tr><td><button id="submit">Submit</button><td>
+    <tr style="line-height: 50%;"><td colspan="2">&nbsp;
+</table>
 <span id="error"></span>
 <span id="progress"></span>
 <div id="result"></div>

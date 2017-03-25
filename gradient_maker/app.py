@@ -70,7 +70,7 @@ def grad_request(msg, send):
     else:
         x = [point[0] for point in parser.grad_points]
         y = [point[1] for point in parser.grad_points]
-        g = Gradient(x, floatX(y) / 255)
+        g = Gradient(x, floatX(y) / 255, periodic=bool(msg['periodic']))
         x_out, y_out, s = g.make_gradient(steps=msg['steps'],
                                           callback=lambda x: send({'_': 'progress', 'text': x}))
         send({'_': 'progress', 'text': s})

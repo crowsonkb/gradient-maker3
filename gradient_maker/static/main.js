@@ -36,8 +36,9 @@ function ws_incoming(e) {
 function submit() {
     var spec = $("#grad-spec")[0].value;
     var steps = parseInt($("[name=steps]")[0].value);
+    var periodic = false;  // $("[value=periodic]").prop("checked");
 
-    ws.send(JSON.stringify({_: "gradRequest", spec: spec, steps: steps}));
+    ws.send(JSON.stringify({_: "gradRequest", spec: spec, steps: steps, periodic: periodic}));
 }
 
 $(document).ready(function() {

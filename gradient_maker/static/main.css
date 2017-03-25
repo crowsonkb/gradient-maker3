@@ -15,8 +15,10 @@ button { padding: 4px 8px; }
 #content { margin: 0 8px; }
 
 #controls button, #controls input {
-    margin: 4px 0;
+    margin: 2px 0;
 }
+
+#controls .label { text-align: right; }
 
 #download-csv {
     font-size: 14px;

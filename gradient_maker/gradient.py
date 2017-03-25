@@ -5,7 +5,7 @@ import sys
 import time
 
 import numpy as np
-from scipy.interpolate import PchipInterpolator
+from scipy.interpolate import CubicSpline, PchipInterpolator
 import theano
 import theano.tensor as T
 import ucs
@@ -26,7 +26,7 @@ class BgColors:
 
 class Gradient:
     """Generates gradients using the CAM02-UCS colorspace."""
-    def __init__(self, x, y, bg=BgColors.NEUTRAL, compile_only=False):
+    def __init__(self, x, y, periodic=False, bg=BgColors.NEUTRAL, compile_only=False):
         if compile_only:
             self.x, self.y, self.bg = None, None, None
             self.make_gradient()
@@ -35,6 +35,7 @@ class Gradient:
         if self.y.ndim != 2 or self.y.shape[-1] != 3:
             raise ValueError('y.ndim must be 2 and y.shape[-1] must be 3 (RGB).')
         self.x = np.linspace(0, 1, len(y)) if x is None else floatX(x)
+        self.periodic = periodic
         self.bg = bg
 
     @staticmethod
@@ -74,7 +75,11 @@ class Gradient:
 
         jmh = ucs.jab_to_jmh(ucs.srgb_to_ucs(self.y, Y_b=ucs.srgb_to_xyz(self.bg)[1] * 100))
         jmh[:, 2] = np.rad2deg(np.unwrap(np.deg2rad(jmh[:, 2])))
-        interp = PchipInterpolator(self.x, jmh, axis=0)
+        if self.periodic:
+            jmh[-1] = jmh[0]
+            interp = CubicSpline(self.x, jmh, axis=0, bc_type='periodic')
+        else:
+            interp = PchipInterpolator(self.x, jmh, axis=0)
         ideal_jmh = np.zeros((steps, 3))
         x = np.linspace(self.x[0], self.x[-1], steps)
         for i, n in enumerate(x):
