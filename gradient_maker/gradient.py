@@ -68,7 +68,7 @@ class Gradient:
             print('Done building functions in {:.3g} seconds.'.format(time.perf_counter() - start),
                   file=sys.stderr)
 
-        # If the method was called only to build loss() and grad(), return early
+        # If the method was called only to precompile Theano functions, return early
         if self.x is None:
             return
 
