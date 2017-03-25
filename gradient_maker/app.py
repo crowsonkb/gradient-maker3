@@ -53,16 +53,19 @@ async def websocket_handler(request):
 
 
 def grad_request(msg, send):
+    if msg['steps'] > 1024:
+        send({'_': 'error', 'text': 'Limit 1024 steps.'})
+        return
+
     parser = Parser()
     try:
-        parser.parse(msg['text'])
+        parser.parse(msg['spec'])
     except ParseException as err:
         send({'_': 'error', 'text': str(err)})
         return
 
     if len(parser.grad_points) < 2:
-        error_text = 'At least two colors are required.'
-        send({'_': 'error', 'text': error_text})
+        send({'_': 'error', 'text': 'At least two colors are required.'})
         return
     else:
         x = [point[0] for point in parser.grad_points]
