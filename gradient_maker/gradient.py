@@ -11,7 +11,7 @@ import theano.tensor as T
 import ucs
 from ucs.constants import floatX, Surrounds
 
-from gradient_maker.optimizer import AdamOptimizer
+from gradient_maker.optimizer import AdamOptimizer  # , lbfgs
 
 # Function compiled in make_gradient() that should persist across instances of Gradient
 opfunc = None
@@ -90,12 +90,23 @@ class Gradient:
         y = floatX(np.random.uniform(-1e-8, 1e-8, size=ideal_jab.shape)) + 0.5
         opt = AdamOptimizer(y, opfunc=lambda y: opfunc(y, ideal_jab, ideal_diff),
                             proj=lambda y: np.clip(y, 0, 1))
-
         for i in opt:
             if i % 100 == 0:
                 loss_ = float(opfunc(y, ideal_jab, ideal_diff)[0])
                 if callback is not None:
                     callback('Iteration {:d}, loss = {:.3f}'.format(i, loss_))
+
+        # i = 0
+        # y_shape = y.shape
+        # def lbfgs_callback(y_opt):
+        #     nonlocal i
+        #     i += 1
+        #     if i % 100 == 0:
+        #         loss_ = float(opfunc(y_opt.reshape(y_shape), ideal_jab, ideal_diff)[0])
+        #         if callback is not None:
+        #             callback('Iteration {:d}, loss = {:.3f}'.format(i, loss_))
+
+        # y = lbfgs(y, lambda y: opfunc(y, ideal_jab, ideal_diff), callback=lbfgs_callback)
 
         done = time.perf_counter()
         s = ('Loss was {:.3f} after {:d} iterations; make_gradient() took {:.3f} seconds.').format(

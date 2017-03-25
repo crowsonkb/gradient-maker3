@@ -1,6 +1,8 @@
 """Function minimization."""
 
 import numpy as np
+from scipy.optimize import fmin_l_bfgs_b
+
 
 class AdamOptimizer:
     """Implements the Adam algorithm for gradient descent. Modifications from standard Adam include
@@ -45,3 +47,15 @@ class AdamOptimizer:
 
         self.last_loss, self.last_grad[:] = loss, grad
         return self.i
+
+
+def lbfgs(x, opfunc, callback=None):
+    """Wraps scipy.optimize.fmin_l_bfgs_b() for inputs with ndim > 1."""
+    x_ = x.reshape(-1).astype(np.float64)
+
+    def wrap_opfunc(flat):
+        loss, grad = opfunc(flat.reshape(x.shape))
+        return loss, grad.reshape(-1).astype(np.float64)
+
+    x_opt, _, _ = fmin_l_bfgs_b(wrap_opfunc, x_, callback=callback, bounds=[(0, 1)]*x.size)
+    return x_opt.reshape(x.shape).astype(x.dtype)
