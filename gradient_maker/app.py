@@ -41,8 +41,7 @@ async def websocket_handler(request):
             if msg['_'] == 'gradRequest':
                 def send(msg):
                     loop.call_soon_threadsafe(ws.send_json, msg)
-                task = loop.run_in_executor(None, grad_request, msg, send)
-                app.tasks.append(task)
+                await loop.run_in_executor(None, grad_request, msg, send)
             else:
                 continue
 
