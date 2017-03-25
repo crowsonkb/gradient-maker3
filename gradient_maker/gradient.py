@@ -9,7 +9,7 @@ from scipy.interpolate import CubicSpline, PchipInterpolator
 import theano
 import theano.tensor as T
 import ucs
-from ucs.constants import EPS, floatX, Surrounds
+from ucs.constants import floatX, Surrounds
 
 from gradient_maker.optimizer import AdamOptimizer
 
@@ -87,7 +87,7 @@ class Gradient:
         ideal_jab = ucs.jmh_to_jab(ideal_jmh)
         ideal_diff = ideal_jab[1:, :] - ideal_jab[:-1, :]
 
-        y = floatX(np.random.uniform(-EPS, EPS, size=ideal_jab.shape)) + 0.5
+        y = floatX(np.random.uniform(-1e-8, 1e-8, size=ideal_jab.shape)) + 0.5
         opt = AdamOptimizer(y, opfunc=lambda y: opfunc(y, ideal_jab, ideal_diff),
                             proj=lambda y: np.clip(y, 0, 1))
 

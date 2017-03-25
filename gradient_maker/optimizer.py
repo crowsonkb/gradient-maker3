@@ -1,8 +1,6 @@
 """Function minimization."""
 
 import numpy as np
-from ucs.constants import EPS
-
 
 class AdamOptimizer:
     """Implements the Adam algorithm for gradient descent. Modifications from standard Adam include
@@ -39,7 +37,7 @@ class AdamOptimizer:
         self.g2[:] = self.b2*self.g2 + (1-self.b2)*grad**2
         old_x = self.x.copy()
         ss = self.step_size * np.sqrt(1-self.b2**self.i) / (1-self.b1**self.i)
-        self.x -= ss * self.g1 / (np.sqrt(self.g2) + EPS)
+        self.x -= ss * self.g1 / (np.sqrt(self.g2) + 1e-8)
         if self.proj is not None:
             self.x[:] = self.proj(self.x)
         if np.mean(abs(old_x - self.x)) < self.factr:
