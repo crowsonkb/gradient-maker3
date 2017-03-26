@@ -16,6 +16,7 @@ class Parser:
         long_hex_color = pp.Suppress('#') + pp.Word(pp.nums + pp.hexnums, exact=6)
         long_hex_color.addParseAction(self.long_hex_color)
         hex_color = long_hex_color | short_hex_color
+        hex_color.addParseAction(lambda: self._set_colorspace('rgb'))
 
         int_or_percent = (ppc.integer + pp.Literal('%')('percent')) | ppc.integer
         int_or_percent.addParseAction(lambda t: t[0] * 255 / 100 if t.percent else t[0])
