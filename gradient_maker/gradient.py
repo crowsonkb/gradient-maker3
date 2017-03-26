@@ -26,15 +26,17 @@ class BgColors:
 
 class Gradient:
     """Generates gradients using the CAM02-UCS colorspace."""
-    def __init__(self, x, y, periodic=False, bg=BgColors.NEUTRAL, compile_only=False):
+    def __init__(self, x, y, colorspace='rgb', periodic=False, bg=BgColors.NEUTRAL,
+                 compile_only=False):
         if compile_only:
             self.x, self.y, self.bg = None, None, None
             self.make_gradient()
             return
         self.y = np.atleast_2d(y)
         if self.y.ndim != 2 or self.y.shape[-1] != 3:
-            raise ValueError('y.ndim must be 2 and y.shape[-1] must be 3 (RGB).')
+            raise ValueError('y.ndim must be 2 and y.shape[-1] must be 3 (RGB/JMH).')
         self.x = np.linspace(0, 1, len(y)) if x is None else floatX(x)
+        self.colorspace = colorspace.lower()
         self.periodic = periodic
         self.bg = bg
 
@@ -73,7 +75,13 @@ class Gradient:
         if self.x is None:
             return
 
-        jmh = ucs.jab_to_jmh(ucs.srgb_to_ucs(self.y, Y_b=ucs.srgb_to_xyz(self.bg)[1] * 100))
+        if self.colorspace == 'rgb':
+            jmh = ucs.jab_to_jmh(ucs.srgb_to_ucs(self.y, Y_b=ucs.srgb_to_xyz(self.bg)[1] * 100))
+        elif self.colorspace == 'jmh':
+            jmh = self.y.copy()
+            jmh[:, 2] = ucs.H_to_h(self.y[:, 2])
+        else:
+            raise ValueError('colorspace must be RGB or JMH')
         jmh[:, 2] = np.rad2deg(np.unwrap(np.deg2rad(jmh[:, 2])))
         if self.periodic:
             jmh[-1] = jmh[0]

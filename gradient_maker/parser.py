@@ -1,9 +1,10 @@
 import pyparsing as pp
-from pyparsing import ParseException, pyparsing_common as ppc
+from pyparsing import ParseBaseException, pyparsing_common as ppc
 
 
 class Parser:
     def __init__(self):
+        self.colorspace = None
         self.grad_points = []
         self.parser = self.build_parser()
 
@@ -22,14 +23,24 @@ class Parser:
         rgb_color_keyword = pp.Suppress('rgba(') | pp.Suppress('rgb(')
         rgb_color = rgb_color_keyword + pp.delimitedList(int_or_percent) + pp.Suppress(')')
         rgb_color.addParseAction(lambda t: (t[0], t[1], t[2]))
+        rgb_color.addParseAction(lambda: self._set_colorspace('rgb'))
 
-        color = hex_color ^ rgb_color
+        jmh_color = pp.Suppress('jmh(') + pp.delimitedList(int_or_percent) + pp.Suppress(')')
+        jmh_color.addParseAction(lambda t: (t[0], t[1], t[2]))
+        jmh_color.addParseAction(lambda: self._set_colorspace('jmh'))
+
+        color = hex_color ^ rgb_color ^ jmh_color
 
         grad_point = number('x') + pp.Optional(':') + color('y')
         grad_point.addParseAction(lambda t: self.grad_points.append((t.x, t.y)))
 
         grad_points = pp.OneOrMore(grad_point + pp.lineEnd())
         return grad_points
+
+    def _set_colorspace(self, colorspace):
+        if self.colorspace is not None and colorspace != self.colorspace:
+            raise pp.ParseFatalException('Colorspace must be all the same.')
+        self.colorspace = colorspace
 
     def parse(self, text):
         return self.parser.parseString(text, parseAll=True)
