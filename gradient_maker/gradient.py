@@ -9,6 +9,7 @@ from scipy.interpolate import CubicSpline, PchipInterpolator
 import theano
 import theano.tensor as T
 import ucs
+from ucs.conditions import Conditions
 from ucs.constants import floatX, Surrounds
 
 from gradient_maker.optimizer import AdamOptimizer  # , lbfgs
@@ -76,7 +77,8 @@ class Gradient:
             return
 
         if self.colorspace == 'rgb':
-            jmh = ucs.jab_to_jmh(ucs.srgb_to_ucs(self.y, Y_b=ucs.srgb_to_xyz(self.bg)[1] * 100))
+            conds = Conditions(Y_w=100, Y_b=ucs.srgb_to_xyz(self.bg)[1] * 100)
+            jmh = ucs.jab_to_jmh(ucs.srgb_to_ucs(self.y, conds))
         elif self.colorspace == 'jmh':
             jmh = self.y.copy()
             jmh[:, 2] = ucs.H_to_h(self.y[:, 2])
