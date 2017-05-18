@@ -14,6 +14,15 @@
 </textarea>
 <table id="controls">
     <tr><td class="label">Steps<td><input type="number" step="1" name="steps" value="30">
+    <tr><td class="label">Interpolator
+        <td><select name="interpolator">
+            <option value="Akima1DInterpolator">Akima</option>
+            <option value="BarycentricInterpolator">Barycentric</option>
+            <option value="CubicSpline">CubicSpline</option>
+            <option value="KroghInterpolator">Krogh</option>
+            <option value="interp1d">Linear</option>
+            <option value="PchipInterpolator">Pchip</option>
+        </select>
     <!-- <tr><td class="label">Periodic<td><input type="checkbox" value="periodic"> -->
     <tr style="line-height: 50%;"><td colspan="2">&nbsp;
     <tr><td><button id="submit">Submit</button><td>

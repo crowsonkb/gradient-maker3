@@ -5,7 +5,7 @@ import sys
 import time
 
 import numpy as np
-from scipy.interpolate import CubicSpline, PchipInterpolator
+from scipy import interpolate
 import theano
 import theano.tensor as T
 import ucs
@@ -45,13 +45,14 @@ class Gradient:
     def compile():
         Gradient(None, None, compile_only=True)
 
-    def make_gradient(self, steps=30, bg=BgColors.NEUTRAL, diff_weight=1e4, callback=None):
+    def make_gradient(self, steps=30, interpolator='PchipInterpolator',
+                      bg=BgColors.NEUTRAL, diff_weight=1e4, callback=None):
         global opfunc
 
         start = time.perf_counter()
 
         def _loss(y, ideal_jab, ideal_diff):
-            jab = ucs.symbolic.srgb_to_ucs(y, 100, 20, ucs.srgb_to_xyz(bg)[1] * 100,
+            jab = ucs.symbolic.srgb_to_ucs(y, 80, 16, ucs.srgb_to_xyz(bg)[1] * 80,
                                            **Surrounds.AVERAGE)
             diff = jab[1:, :] - jab[:-1, :]
             ucs_loss = T.sum(T.sqr(jab - ideal_jab))
@@ -87,9 +88,11 @@ class Gradient:
         jmh[:, 2] = np.rad2deg(np.unwrap(np.deg2rad(jmh[:, 2])))
         if self.periodic:
             jmh[-1] = jmh[0]
-            interp = CubicSpline(self.x, jmh, axis=0, bc_type='periodic')
+            interp = interpolate.CubicSpline(self.x, jmh, axis=0, bc_type='periodic')
         else:
-            interp = PchipInterpolator(self.x, jmh, axis=0)
+            if not hasattr(interpolate, interpolator):
+                raise ValueError('interpolator must exist in scipy.interpolate')
+            interp = getattr(interpolate, interpolator)(self.x, jmh, axis=0)
         ideal_jmh = np.zeros((steps, 3))
         x = np.linspace(self.x[0], self.x[-1], steps)
         for i, n in enumerate(x):

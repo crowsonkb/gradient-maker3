@@ -71,7 +71,7 @@ def grad_request(msg, send):
         y = [point[1] for point in parser.grad_points]
         y = floatX(y) / 255 if parser.colorspace == 'rgb' else y
         g = Gradient(x, y, colorspace=parser.colorspace, periodic=bool(msg['periodic']))
-        x_out, y_out, s = g.make_gradient(steps=msg['steps'],
+        x_out, y_out, s = g.make_gradient(steps=msg['steps'], interpolator=msg['interpolator'],
                                           callback=lambda x: send({'_': 'progress', 'text': x}))
         send({'_': 'progress', 'text': s})
         css_data_url = 'data:text/css,' + urllib.parse.quote(g.to_css(x_out, y_out))
