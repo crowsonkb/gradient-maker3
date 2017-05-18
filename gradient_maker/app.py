@@ -74,8 +74,10 @@ def grad_request(msg, send):
         x_out, y_out, s = g.make_gradient(steps=msg['steps'],
                                           callback=lambda x: send({'_': 'progress', 'text': x}))
         send({'_': 'progress', 'text': s})
+        css_data_url = 'data:text/css,' + urllib.parse.quote(g.to_css(x_out, y_out))
         csv_data_url = 'data:text/csv,' + urllib.parse.quote(g.to_csv(x_out, y_out))
-        send({'_': 'result', 'html': g.to_html(x_out, y_out), 'downloadCsv': csv_data_url})
+        send({'_': 'result', 'html': g.to_html(x_out, y_out),
+              'asCSS': css_data_url, 'asCSV': csv_data_url})
 
 app.router.add_get('/', root_handler)
 app.router.add_static('/static', PACKAGE/'static')

@@ -26,7 +26,8 @@ function ws_incoming(e) {
     case "result":
         $("#error").text("");
         $("#result").html(msg.html);
-        $("#download-csv").html("<a href='" + msg.downloadCsv + "'>Download as CSV</a>");
+        $("#as-css").html("<a href='" + msg.asCSS + "'>Download as CSS</a><br>");
+        $("#as-csv").html("<a href='" + msg.asCSV + "'>Download as CSV</a>");
         break;
     default:
         break;

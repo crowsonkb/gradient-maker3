@@ -153,6 +153,18 @@ class Gradient:
         return s.getvalue()
 
     @staticmethod
+    def to_css(x, y):
+        s = io.StringIO()
+        s.write('linear-gradient(')
+        stops = []
+        for x_elem, y_elem in zip(x, y):
+            stops.append('rgb({:.1f}%, {:.1f}%, {:.1f}%) {:.1f}%'.format(*(y_elem * 100),
+                                                                         x_elem * 100))
+        s.write(', '.join(stops))
+        s.write(');')
+        return s.getvalue()
+
+    @staticmethod
     def to_csv(x, y):
         s = io.StringIO()
         s.write('x,r,g,b\n')
